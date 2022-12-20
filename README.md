@@ -1,5 +1,5 @@
-# COVID-19-Computed-Tomographic-Images-Segmentation-and-Infection-Detection
-COVID-19 Computed Tomographic Images Segmentation and Infection Detection
+# Computed-Tomographic-Images-Segmentation-and-Infection-Detection
+Computed Tomographic Images Segmentation and Infection Detection
 
 
 Web-based GUI
