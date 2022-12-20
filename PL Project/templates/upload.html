@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+
+<head>
+  <title>Image Segmentation and Infection Detection</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: "Montserrat", sans-serif
+    }
+
+    .w3-row-padding img {
+      margin-bottom: 12px
+    }
+
+    /* Set the width of the sidebar to 120px */
+    .w3-sidebar {
+      width: 120px;
+      background: #4682B4;
+    }
+
+    /* Add a left margin to the "page content" that matches the width of the sidebar (120px) */
+    #main {
+      margin-left: 120px
+    }
+
+    /* Remove margins from "page content" on small screens */
+    @media only screen and (max-width: 600px) {
+      #main {
+        margin-left: 0
+      }
+    }
+
+    body {
+
+      background: #4682B4;
+      display: flex;
+      flex-direction: column;
+      font-family: Lato;
+      height: 100%;
+      margin: auto;
+      text-shadow: 0 0px 2px rgba(245, 245, 245, .25);
+    }
+
+    #container {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, .75);
+      margin: auto;
+      width: auto;
+    }
+
+    .box-input {
+      text-align: center;
+    }
+
+    .box-input svg {
+      width: 5rem;
+      height: 5rem;
+      vertical-align: middle;
+      fill: currentColor;
+    }
+
+    form {
+      color: #fff;
+    }
+
+    input[type="button" i],
+    input[type="file" i]::-webkit-file-upload-button {
+      display: none !important;
+    }
+
+    .box.has-advanced-upload {
+      transition: all .15s ease-in-out, background-color .15s linear;
+    }
+
+    .box {
+      font-size: 1.25rem;
+      background-color: #4682B4;
+      border: 4px solid #fff;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, .75);
+      padding: 5rem 8rem;
+      width: 100%;
+    }
+
+    .js .box-file {
+      width: .1px;
+      height: .1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+
+    .box-input label {
+      margin: auto;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #fff;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+      overflow: hidden;
+    }
+
+    .js .box-file+label * {
+      pointer-events: none;
+    }
+
+    .js .box-file:focus+label {
+      outline: 1px dotted #000;
+      outline: -webkit-focus-ring-color auto 5px;
+    }
+
+    button {
+      background: #0CE9AF;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .25);
+      color: #fff;
+      display: flex;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: auto;
+      margin-top: 2.5rem;
+      overflow: auto;
+      padding: 1rem 1.5rem;
+    }
+
+    button:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .5);
+    }
+
+    button:active {
+      box-shadow: none;
+    }
+
+    .box-uploading {
+      font-style: italic;
+    }
+
+    .box-success {
+      transition: appear-from-inside .25s ease-in-out;
+    }
+
+    .box__success {
+      animation: appear-from-inside .25s ease-in-out;
+    }
+
+    @keyframes appear-from-inside {
+      from {
+        transform: translateY(-50%) scale(0);
+      }
+
+      75% {
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      to {
+        transform: translateY(-50%) scale(1);
+      }
+    }
+
+    .box-restart {
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      border-radius: 0;
+      border: none;
+    }
+
+    input {
+      line-height: normal;
+    }
+
+    .box-dragndrop,
+    .box-icon,
+    .box-uploading,
+    .box-success,
+    .box-error {
+      display: none;
+    }
+
+    .box.has-advanced-upload .box-dragndrop {
+      display: inline;
+    }
+
+    strong {
+      color: #fff;
+    }
+
+
+    /* Three image containers (use 25% for four, and 50% for two, etc) */
+    .column {
+      float: left;
+      width: 20%;
+      padding: 5px;
+    }
+
+    /* Clear floats after image containers */
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+  </style>
+
+
+
+</head>
+
+<!-- <header class="intro-header" style="background-image: url({{url_for('static', filename='28638.jpg')}})"></header> -->
+
+<body class="w3-black" style="background-color: #1E90FF">
+
+  <!-- Icon Bar (Sidebar - hidden on small screens) -->
+  <nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
+    <!-- Avatar image in top left corner -->
+    <img src="{{url_for('static', filename='28638.jpg')}}" style="width:100%" />
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+      <i class="fa fa-home w3-xxlarge"></i>
+      <p>HOME</p>
+    </a>
+    <a href="#about" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+      <i class="fa fa-user w3-xxlarge"></i>
+      <p>Project</p>
+    </a>
+    <a href="#photos" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+      <i class="fa fa-eye w3-xxlarge"></i>
+      <p>Segmentation</p>
+    </a>
+    <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+      <i class="fa fa-envelope w3-xxlarge"></i>
+      <p>CONTACT</p>
+    </a>
+  </nav>
+
+  <!-- Navbar on small screens (Hidden on medium and large screens) -->
+  <div class="w3-top w3-hide-large w3-hide-medium" id="myNavbar">
+    <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
+      <a href="#" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+      <a href="#about" class="w3-bar-item w3-button" style="width:25% !important">Project</a>
+      <a href="#photos" class="w3-bar-item w3-button" style="width:25% !important">Segmentation</a>
+      <a href="#contact" class="w3-bar-item w3-button" style="width:25% !important">CONTACT</a>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="w3-padding-large" id="main">
+    <!-- Header/Home -->
+    <header class="w3-container w3-padding-32 w3-center w3-black" id="home">
+      <h1 class="w3-jumbo"><span class="w3-hide-small">Image Segmentation &</span> Infection Detection</h1>
+      <p>...... </p>
+
+      <!-- <img src="{{url_for('static', filename='call-to-action-bg.jpg')}}" align="middle" /> -->
+    </header>
+
+
+    <!-- About Section -->
+    <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
+      <h2>Lung Infection Detection</h2>
+      <div id="container">
+        <form method="post" enctype="multipart/form-data" novalidate="" class="box has-advanced-upload">
+          <div class="box-input">
+            <svg x="0px" y="0px" viewBox="0 0 64 62" style="enable-background:new 0 0 64 62;" xml:space="preserve">
+              <style type="text/css">
+                .st0 {
+                  fill: none;
+                  stroke: #fff;
+                  stroke-width: 2;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                  stroke-miterlimit: 10;
+                }
+              </style>
+              <g id="spa-launch">
+                <path class="st0" d="M33,27.1h-8c0,0-2-6-2-12c0-8,6-14,6-14s6,6,6,14C35,21.1,33,27.1,33,27.1z" />
+                <line class="st0" x1="29" y1="17.1" x2="29" y2="27.1" />
+                <polyline class="st0" points="25,27.1 17,27.1 17,23.1 23.1,17.1 	" />
+                <polyline class="st0" points="33,27.1 41,27.1 41,23.1 34.9,17.1 	" />
+                <path class="st0" d="M18,41.2c0.5-5.7,5.2-10.1,11-10.1c5.1,0,9.3,3.4,10.6,8.1" />
+                <path class="st0" d="M48,41.1c-0.2-3.4-3.1-6-6.5-6c-1.2,0-2.4,0.3-3.3,0.9" />
+                <path class="st0" d="M42.3,47.1c0,0-1-4-6-4" />
+                <path class="st0" d="M26.3,43.1c-3-1-4,2-4,2s-3-2-5,0s-1,4-1,4" />
+                <path class="st0" d="M9,46.1c-0.8-0.6-1.9-1-3-1c-2.8,0-5,2.2-5,5s2.2,5,5,5h46c2.8,0,5-2.2,5-5c0-5-4-9-9-9
+                c-0.9,0-1.8,0.1-2.6,0.4" />
+                <path class="st0" d="M18.8,37.9c-1.1-0.5-2.4-0.8-3.8-0.8c-4.6,0-8.5,3.5-8.9,8" />
+              </g>
+            </svg>
+            <input type="file" name="files[]" id="file" class="box-file" data-multiple-caption="{count} files selected"
+              multiple="">
+            <label for="file"><strong>Choose a file</strong><span class="box-dragndrop"> or drag it here</span>.</label>
+            <div>
+              <center>
+                <h2>Select Original CT Image and Its Infection Mask for prediction!</h2>
+                <p>
+                  {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                <ul class=flashes>
+                  {% for message in messages %}
+                  <li>{{ message }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+                </p>
+
+                <form method="post" action="/" enctype="multipart/form-data">
+                  <dl>
+                    <p>
+                      <input type="file" name="files[]" multiple="true" autocomplete="off" required>
+                    </p>
+                  </dl>
+                  <p>
+                    <input type="submit" value="Submit">
+                  </p>
+                </form>
+
+                {% if filenames %}
+                {% for filename in filenames %}
+                <div>
+                  <img src="{{ url_for('display_image', filename=filename) }}" style="width:100%" /> -->
+                </div>
+                {% endfor %}
+                {% endif %}
+              </center>
+            </div>
+
+          </div>
+
+          <div class="container">
+            <div id="mukesh">
+              <!-- Add id to image -->
+              <!-- <img id="image" src="{{url_for('static', filename='28638.jpg')}}" alt="GFG image" style="width:100%" /> -->
+              -->
+              <!-- </div>
+            <form method="post" action="/predict">
+              <input type="submit" value="Submit">
+            </form> -->
+
+              <h1 style="color:green;">
+                Prediction:
+              </h1>
+
+              <p id="GFG_UP" style="font-size: 15px; font-weight: bold;">
+              </p>
+              <form method="post" action="/predict">
+                <button type="submit">
+                  Predict Infection
+                </button>
+              </form>
+              <p id="GFG_DOWN" style="color:green; font-size: 20px; font-weight: bold;">
+              </p>
+
+            </div>
+            <div id="output"></div>
+
+            <h2 class="w3-text-light-grey">Project Overview</h2>
+            <hr style="width:200px" class="w3-opacity">
+            <p>To get covid-19 test results it takes around 2-3 days because of so many Covid-19 cases . In Medical
+              field
+              when we want to use AI and ML, sometimes Dataset is so much big that it takes days to train data and we
+              also
+              have to find Region of interest ( e.g., Lung in image or size of tumor).</p>
+            <p>
+              So, we are Proposing a solution to Segment Lungs from Lung Computed tomographic Images of Patients and to
+              detect COVID-19 Infection in Lungs of patients.</p>
+            <p>
+              For Segmentation, We had used Marker-based watershed algorithm using Otus’s binary thresholding (didn’t
+              give
+              expected Segmented lung Images) and watershed algorithm using Sobel-Gradient (Gives the expected Segmented
+              lung Images).</p>
+            <p>
+              For COVID – 19 Infection Detection I will use (CLAHE) Contrast Limited Adaptive Histogram Equalization to
+              enhance the contrast of the images since medical images suffer a lot from the contrast problems and Unet
+              Base on ResNet34 model and build the neural network using 3 Conv Blocks, each block has two 3x3
+              convolutional layers with 16, 32 , 64 filters.</p>
+            <p>
+              In Future, these Segmented images can also be used to detect Pneumonia and other types of lung infections.
+            </p>
+
+          </div>
+
+          <!-- Portfolio Section -->
+          <div class="w3-padding-64 w3-content" id="photos">
+            <h2 class="w3-text-light-grey">Lung CT Image Segmentation</h2>
+            <hr style="width:200px" class="w3-opacity">
+            <div class="row">
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/JPG/CD80-00001.png')}}" alt="Snow" style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/JPG/CD80-00002.png')}}" alt="Forest"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/JPG/CD80-00003.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/JPG/CD80-00004.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/JPG/CD80-00005.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Overlay/m011-CD80-00001.png')}}" alt="Snow"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Overlay/m011-CD80-00002.png')}}" alt="Forest"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Overlay/m011-CD80-00003.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Overlay/m011-CD80-00004.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Overlay/m011-CD80-00005.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Color/m011-CD80-00001.png')}}" alt="Snow"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Color/m011-CD80-00002.png')}}" alt="Forest"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Color/m011-CD80-00003.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Color/m011-CD80-00004.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Color/m011-CD80-00005.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Normalize/m011-CD80-00001.png')}}" alt="Snow"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Normalize/m011-CD80-00002.png')}}" alt="Forest"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Normalize/m011-CD80-00003.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Normalize/m011-CD80-00004.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+              <div class="column">
+                <img src="{{url_for('static', filename='COVID80/Normalize/m011-CD80-00005.png')}}" alt="Mountains"
+                  style="width:100%" />
+              </div>
+            </div>
+            <!-- Grid for photos -->
+
+            <!-- End Portfolio Section -->
+          </div>
+
+          <!-- Contact Section -->
+          <div class="w3-padding-64 w3-content w3-text-grey" id="contact">
+            <h2 class="w3-text-light-grey">Contact Me</h2>
+            <hr style="width:200px" class="w3-opacity">
+
+            <div class="w3-section">
+              <p><i class="fa fa-map-marker fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> DAIICT, Gandhinagar,
+                India
+              </p>
+              <p><i class="fa fa-phone fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> Phone: +91 6397535172</p>
+              <p><i class="fa fa-envelope fa-fw w3-text-white w3-xxlarge w3-margin-right"> </i> Email:
+                Krishna.veer.singh66@gmail.com
+              </p>
+              <p><i class="fa fa-envelope fa-fw w3-text-white w3-xxlarge w3-margin-right"> </i> Email:
+                jmukesh1999@gmail.com
+              </p>
+            </div><br>
+
+            <!-- End Contact Section -->
+          </div>
+
+          <!-- Footer -->
+          <!-- <footer class="w3-content w3-padding-64 w3-text-grey w3-xlarge">
+            <i class="fa fa-facebook-official w3-hover-opacity"></i>
+            <i class="fa fa-instagram w3-hover-opacity"></i>
+            <i class="fa fa-snapchat w3-hover-opacity"></i>
+            <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+            <i class="fa fa-twitter w3-hover-opacity"></i>
+            <i class="fa fa-linkedin w3-hover-opacity"></i>
+            <p class="w3-medium">Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank"
+                    class="w3-hover-text-green">w3.css</a></p>
+            End footer
+        </footer> -->
+
+          <!-- END PAGE CONTENT -->
+      </div>
+
+</body>
+
+<script>
+  var up = document.getElementById('GFG_UP');
+  up.innerHTML = "Click on the button to Predict Infection";
+  var down = document.getElementById('GFG_DOWN');
+
+  var img = document.createElement('img');
+  img.src =
+    '{{filename}}';
+  document.getElementById('mukesh').appendChild(img);
+  down.innerHTML = "Image Element Added.";
+</script>
